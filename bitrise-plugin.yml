@@ -1,0 +1,15 @@
+name: analytics
+description: |-
+  Submitting anonymized usage information.
+  This usage helps us identify any problems with the integrations.
+  The sent data only contains information about steps (id, version, runtime, error), NO logs or other data is included.
+  For more information visit: https://github.com/bitrise-io/bitrise/blob/master/README.md
+trigger: DidFinishRun
+executable: ""
+requirements:
+- tool: envman
+  min_version: "1.0.0"
+  max_version: ""
+- tool: bitrise
+  min_version: 1.3.0
+  max_version: ""

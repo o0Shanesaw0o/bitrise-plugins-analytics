@@ -1,0 +1,61 @@
+format_version: 1.0.0
+default_step_lib_source: https://github.com/bitrise-io/bitrise-steplib.git
+
+app:
+  envs:
+  - PLUGIN_NAME: analytics
+
+workflows:
+  test:
+    before_run:
+    - create-bin
+    steps:
+    - script:
+        title: Install plugin
+        inputs:
+        - content: |
+            #!/bin/bash
+            set -e
+
+            bitrise plugin install \
+              --source "file://." \
+              --bin-source "file://$DEPLOY_PATH"
+    - script:
+        title: Plugin test
+        inputs:
+        - content: |
+            #!/bin/bash
+            set -e
+
+            bitrise :$PLUGIN_NAME --loglevel debug on
+            bitrise :$PLUGIN_NAME --loglevel debug -v
+
+  create-bin:
+    envs:
+    - BIN_NAME: analytics
+    steps:
+    - script:
+        title: Generate bin
+        inputs:
+        - content: |
+            #!/bin/bash
+
+            set -e
+
+            # Create bins
+            rm -rf ./_bin/tmp-bins/
+
+            export ARCH=x86_64
+            export GOARCH=amd64
+
+            export OS=Darwin
+            export GOOS=darwin
+            deploy_pth="./_bin/$BIN_NAME-$OS-$ARCH"
+            go build -o "$deploy_pth"
+
+            envman add --key DEPLOY_PATH  --value $deploy_pth
+
+            export OS=Linux
+            export GOOS=linux
+            deploy_pth="./_bin/$BIN_NAME-$OS-$ARCH"
+            go build -o "$deploy_pth"

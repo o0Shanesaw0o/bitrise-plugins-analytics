@@ -5,7 +5,9 @@ description: |-
   The sent data only contains information about steps (id, version, runtime, error), NO logs or other data is included.
   For more information visit: https://github.com/bitrise-io/bitrise/blob/master/README.md
 trigger: DidFinishRun
-executable: https://github.com/bitrise-core/bitrise-plugins-analytics/releases/download/0.9.0/analytics-$(uname -s)-$(uname -m)
+executable:
+  osx: https://github.com/bitrise-core/bitrise-plugins-analytics/releases/download/0.9.0/analytics-Darwin-x86_64
+  linux: https://github.com/bitrise-core/bitrise-plugins-analytics/releases/download/0.9.0/analytics-Linux-x86_64
 requirements:
 - tool: envman
   min_version: "1.0.0"

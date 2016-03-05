@@ -101,6 +101,17 @@ func action(c *cli.Context) {
 	log.Debugf("pluginInputPluginMode: %s", pluginMode)
 
 	if pluginMode == string(triggerMode) {
+		config, err := configs.ReadConfig()
+		if err != nil {
+			log.Fatalf("Failed to read analytics configuration, error: %s", err)
+		}
+
+		if config.IsAnalyticsDisabled {
+			log.Debug("")
+			log.Debug("Analytics disabled")
+			return
+		}
+
 		payload := os.Getenv(pluginInputPayloadKey)
 
 		log.Debug("")

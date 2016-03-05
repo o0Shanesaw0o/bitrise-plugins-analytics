@@ -47,7 +47,8 @@ func getConfigFilePath() (string, error) {
 	return path.Join(DataDir, "config.yml"), nil
 }
 
-func readConfig() (ConfigModel, error) {
+// ReadConfig ...
+func ReadConfig() (ConfigModel, error) {
 	config := ConfigModel{}
 
 	configPth, err := getConfigFilePath()
@@ -87,7 +88,7 @@ func saveConfig(config ConfigModel) error {
 
 // SetAnalytics ...
 func SetAnalytics(enabled bool) error {
-	config, err := readConfig()
+	config, err := ReadConfig()
 	if err != nil {
 		return err
 	}

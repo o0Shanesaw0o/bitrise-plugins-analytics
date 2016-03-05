@@ -59,3 +59,47 @@ workflows:
             export GOOS=linux
             deploy_pth="./_bin/$BIN_NAME-$OS-$ARCH"
             go build -o "$deploy_pth"
+
+            current_bin_path="./_bin/$BIN_NAME-$(uname -s)-$(uname -m)"
+            echo "current_bin_path: $current_bin_path"
+
+            envman add --key DEPLOY_PATH --value $current_bin_path
+
+  create-release:
+    after_run:
+    - create-bin
+    steps:
+    - script:
+        title:
+        inputs:
+        - content: |
+            #!/bin/bash
+
+            set -e
+
+            # Draft new release
+            export CI=true
+            releaseman create \
+              --get-version-script "go run _scripts/get_version.go -file version/version.go" \
+              --bump-version patch \
+              --set-version-script "bash _scripts/set_version.sh version/version.go"
+
+  create-release-version:
+    envs:
+    - RELEASE_VERSION: 0.9.1
+    after_run:
+    - create-bin
+    steps:
+    - script:
+        title:
+        inputs:
+        - content: |
+            #!/bin/bash
+
+            set -e
+
+            # Draft new release
+            export CI=true
+            releaseman create \
+              --version $RELEASE_VERSION \
+              --set-version-script "bash _scripts/set_version.sh version/version.go"

@@ -6,8 +6,8 @@ description: |-
   For more information visit: https://github.com/bitrise-io/bitrise/blob/master/README.md
 trigger: DidFinishRun
 executable:
-  osx: https://github.com/bitrise-core/bitrise-plugins-analytics/releases/download/0.9.0/analytics-Darwin-x86_64
-  linux: https://github.com/bitrise-core/bitrise-plugins-analytics/releases/download/0.9.0/analytics-Linux-x86_64
+  osx: https://github.com/bitrise-core/bitrise-plugins-analytics/releases/download/0.9.1/analytics-Darwin-x86_64
+  linux: https://github.com/bitrise-core/bitrise-plugins-analytics/releases/download/0.9.1/analytics-Linux-x86_64
 requirements:
 - tool: envman
   min_version: "1.0.0"

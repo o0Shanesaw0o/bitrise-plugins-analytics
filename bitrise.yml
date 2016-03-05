@@ -66,8 +66,8 @@ workflows:
             envman add --key DEPLOY_PATH --value $current_bin_path
 
   create-release:
-    after_run:
-    - create-bin
+    before_run:
+    - test
     steps:
     - script:
         title:
@@ -87,8 +87,8 @@ workflows:
   create-release-version:
     envs:
     - RELEASE_VERSION: 0.9.1
-    after_run:
-    - create-bin
+    before_run:
+    - test
     steps:
     - script:
         title:

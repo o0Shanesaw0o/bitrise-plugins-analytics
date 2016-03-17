@@ -4,6 +4,7 @@ default_step_lib_source: https://github.com/bitrise-io/bitrise-steplib.git
 app:
   envs:
   - PLUGIN_NAME: analytics
+  - PLUGIN_GO_PATH: "./go/src/github.com/bitrise-core/bitrise-plugins-analytics"
 
 workflows:
   test:
@@ -31,9 +32,6 @@ workflows:
             bitrise :$PLUGIN_NAME --loglevel debug -v
 
   create-bin:
-    envs:
-    - BIN_NAME: analytics
-    - PLUGIN_GO_PATH: "./go/src/github.com/bitrise-core/bitrise-plugins-analytics"
     steps:
     - script:
         title: Generate bin
@@ -51,7 +49,7 @@ workflows:
 
             export OS=Darwin
             export GOOS=darwin
-            deploy_pth="./_bin/$BIN_NAME-$OS-$ARCH"
+            deploy_pth="./_bin/$PLUGIN_NAME-$OS-$ARCH"
 
             cd $PLUGIN_GO_PATH
             go build -o "$deploy_pth"
@@ -61,13 +59,13 @@ workflows:
 
             export OS=Linux
             export GOOS=linux
-            deploy_pth="./_bin/$BIN_NAME-$OS-$ARCH"
+            deploy_pth="./_bin/$PLUGIN_NAME-$OS-$ARCH"
 
             cd $PLUGIN_GO_PATH
             go build -o "$deploy_pth"
             cd -
 
-            current_bin_path="./_bin/$BIN_NAME-$(uname -s)-$(uname -m)"
+            current_bin_path="./_bin/$PLUGIN_NAME-$(uname -s)-$(uname -m)"
             echo "current_bin_path: $current_bin_path"
 
             envman add --key DEPLOY_PATH --value $current_bin_path
@@ -84,16 +82,18 @@ workflows:
 
             set -e
 
+            version_file_pth="./go/src/github.com/bitrise-core/bitrise-plugins-analytics/version/version.go"
+
             # Draft new release
             export CI=true
             releaseman create \
-              --get-version-script "go run _scripts/get_version.go -file version/version.go" \
+              --get-version-script "go run _scripts/get_version.go -file $version_file_pth" \
               --bump-version patch \
-              --set-version-script "bash _scripts/set_version.sh version/version.go"
+              --set-version-script "bash _scripts/set_version.sh $version_file_pth"
 
   create-release-version:
     envs:
-    - RELEASE_VERSION: 0.9.1
+    - RELEASE_VERSION: 0.9.2
     before_run:
     - test
     steps:
@@ -105,8 +105,10 @@ workflows:
 
             set -e
 
+            version_file_pth="./go/src/github.com/bitrise-core/bitrise-plugins-analytics/version/version.go"
+
             # Draft new release
             export CI=true
             releaseman create \
               --version $RELEASE_VERSION \
-              --set-version-script "bash _scripts/set_version.sh version/version.go"
+              --set-version-script "bash _scripts/set_version.sh $version_file_pth"

@@ -33,6 +33,7 @@ workflows:
   create-bin:
     envs:
     - BIN_NAME: analytics
+    - PLUGIN_GO_PATH: "./go/src/github.com/bitrise-core/bitrise-plugins-analytics"
     steps:
     - script:
         title: Generate bin
@@ -51,14 +52,20 @@ workflows:
             export OS=Darwin
             export GOOS=darwin
             deploy_pth="./_bin/$BIN_NAME-$OS-$ARCH"
+
+            cd $PLUGIN_GO_PATH
             go build -o "$deploy_pth"
+            cd -
 
             envman add --key DEPLOY_PATH  --value $deploy_pth
 
             export OS=Linux
             export GOOS=linux
             deploy_pth="./_bin/$BIN_NAME-$OS-$ARCH"
+
+            cd $PLUGIN_GO_PATH
             go build -o "$deploy_pth"
+            cd -
 
             current_bin_path="./_bin/$BIN_NAME-$(uname -s)-$(uname -m)"
             echo "current_bin_path: $current_bin_path"

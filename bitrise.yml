@@ -5,6 +5,7 @@ app:
   envs:
   - PLUGIN_NAME: analytics
   - PLUGIN_GO_PATH: "./go/src/github.com/bitrise-core/bitrise-plugins-analytics"
+  - VERSION_FILE_PATH: "./go/src/github.com/bitrise-core/bitrise-plugins-analytics/version/version.go"
 
 workflows:
   test:
@@ -44,28 +45,28 @@ workflows:
             # Create bins
             rm -rf ./_bin/tmp-bins/
 
+            current_dir=$(pwd)
+
             export ARCH=x86_64
             export GOARCH=amd64
 
             export OS=Darwin
             export GOOS=darwin
-            deploy_pth="./_bin/$PLUGIN_NAME-$OS-$ARCH"
+            deploy_pth="$current_dir/_bin/$PLUGIN_NAME-$OS-$ARCH"
 
             cd $PLUGIN_GO_PATH
             go build -o "$deploy_pth"
             cd -
-
-            envman add --key DEPLOY_PATH  --value $deploy_pth
 
             export OS=Linux
             export GOOS=linux
-            deploy_pth="./_bin/$PLUGIN_NAME-$OS-$ARCH"
+            deploy_pth="$current_dir/_bin/$PLUGIN_NAME-$OS-$ARCH"
 
             cd $PLUGIN_GO_PATH
             go build -o "$deploy_pth"
             cd -
 
-            current_bin_path="./_bin/$PLUGIN_NAME-$(uname -s)-$(uname -m)"
+            current_bin_path="$current_dir/_bin/$PLUGIN_NAME-$(uname -s)-$(uname -m)"
             echo "current_bin_path: $current_bin_path"
 
             envman add --key DEPLOY_PATH --value $current_bin_path
@@ -82,14 +83,12 @@ workflows:
 
             set -e
 
-            version_file_pth="./go/src/github.com/bitrise-core/bitrise-plugins-analytics/version/version.go"
-
             # Draft new release
             export CI=true
             releaseman create \
-              --get-version-script "go run _scripts/get_version.go -file $version_file_pth" \
+              --get-version-script "go run _scripts/get_version.go -file $VERSION_FILE_PATH" \
               --bump-version patch \
-              --set-version-script "bash _scripts/set_version.sh $version_file_pth"
+              --set-version-script "bash _scripts/set_version.sh $VERSION_FILE_PATH"
 
   create-release-version:
     envs:
@@ -105,10 +104,8 @@ workflows:
 
             set -e
 
-            version_file_pth="./go/src/github.com/bitrise-core/bitrise-plugins-analytics/version/version.go"
-
             # Draft new release
             export CI=true
             releaseman create \
               --version $RELEASE_VERSION \
-              --set-version-script "bash _scripts/set_version.sh $version_file_pth"
+              --set-version-script "bash _scripts/set_version.sh $VERSION_FILE_PATH"

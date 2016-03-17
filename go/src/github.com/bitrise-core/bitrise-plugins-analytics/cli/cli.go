@@ -168,9 +168,6 @@ func Run() {
 
 	app := cli.NewApp()
 
-	log.Debug("")
-	log.Debugf("os.Args: %v", os.Args)
-
 	app.Name = path.Base(os.Args[0])
 	app.Usage = "Bitrise Analytics plugin"
 	app.Version = version.VERSION

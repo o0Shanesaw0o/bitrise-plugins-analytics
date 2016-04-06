@@ -23,6 +23,7 @@ const (
 	pluginInputTriggerEventKey   = "BITRISE_PLUGIN_INPUT_TRIGGER"
 	pluginInputPluginModeKey     = "BITRISE_PLUGIN_INPUT_PLUGIN_MODE"
 	pluginInputDataDirKey        = "BITRISE_PLUGIN_INPUT_DATA_DIR"
+	cIModeKey                    = "CI"
 
 	bitrisePluginOutputEnvKey = "BITRISE_PLUGIN_OUTPUT"
 )
@@ -90,6 +91,11 @@ func before(c *cli.Context) error {
 
 	log.Debug("")
 	log.Debugf("pluginInputDataDir: %s", configs.DataDir)
+
+	configs.IsCIMode = (os.Getenv(cIModeKey) == "true")
+
+	log.Debug("")
+	log.Debugf("pluginInputCIModeKey: %v", configs.IsCIMode)
 
 	return nil
 }

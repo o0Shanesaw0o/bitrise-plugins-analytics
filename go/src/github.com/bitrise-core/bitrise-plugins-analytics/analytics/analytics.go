@@ -8,6 +8,7 @@ import (
 	"time"
 
 	log "github.com/Sirupsen/logrus"
+	"github.com/bitrise-core/bitrise-plugins-analytics/configs"
 )
 
 //=======================================
@@ -22,10 +23,11 @@ const analyticsURL = "https://bitrise-stats.herokuapp.com/save"
 
 // AnonymizedUsageModel ...
 type AnonymizedUsageModel struct {
-	ID      string        `json:"step"`
-	Version string        `json:"version"`
-	RunTime time.Duration `json:"duration"`
-	Error   bool          `json:"error"`
+	ID      string  `json:"step"`
+	Version string  `json:"version"`
+	RunTime float64 `json:"duration"`
+	Error   bool    `json:"error"`
+	CI      bool    `json:"ci"`
 }
 
 // AnonymizedUsageGroupModel ...
@@ -68,14 +70,21 @@ func SendAnonymizedAnalytics(buildRunResults BuildRunResultsModel) error {
 		anonymizedUsageData := AnonymizedUsageModel{
 			ID:      stepRunResult.StepInfo.ID,
 			Version: stepRunResult.StepInfo.Version,
-			RunTime: stepRunResult.RunTime,
+			RunTime: stepRunResult.RunTime.Seconds(),
 			Error:   stepRunResult.Status != 0,
+			CI:      configs.IsCIMode,
 		}
 
 		anonymizedUsageGroup.Steps = append(anonymizedUsageGroup.Steps, anonymizedUsageData)
 	}
 
-	data, err := json.Marshal(anonymizedUsageGroup)
+	data, err := json.MarshalIndent(anonymizedUsageGroup, "", "\t")
+	if err != nil {
+		return err
+	}
+	log.Debugf("data:\n%s", string(data))
+
+	data, err = json.Marshal(anonymizedUsageGroup)
 	if err != nil {
 		return err
 	}

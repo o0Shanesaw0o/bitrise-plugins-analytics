@@ -14,8 +14,12 @@ import (
 // Variables
 //=======================================
 
-// DataDir ...
-var DataDir string
+var (
+	// DataDir ...
+	DataDir string
+	// IsCIMode ...
+	IsCIMode bool
+)
 
 //=======================================
 // Models

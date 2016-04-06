@@ -1,6 +1,12 @@
-## Changelog (Current version: 0.9.2)
+## Changelog (Current version: 0.9.3)
 
 -----------------
+
+### 0.9.3 (2016 Apr 06)
+
+* [4592402] Merge pull request #1 from bitrise-core/ci_mode
+* [fed239c] prepare for new version
+* [c38f975] ci mode
 
 ### 0.9.2 (2016 Mar 17)
 
@@ -17,4 +23,4 @@
 
 -----------------
 
-Updated: 2016 Mar 17
+Updated: 2016 Apr 06

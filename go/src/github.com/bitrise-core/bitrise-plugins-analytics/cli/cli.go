@@ -129,17 +129,13 @@ func action(c *cli.Context) {
 		}
 
 		log.Infof("")
-		log.Infof("\x1b[34;1mSubmitting anonymized usage information...\x1b[0m")
+		log.Infof("Submitting anonymized usage information...")
+		log.Infof("For more information visit:")
+		log.Infof("https://github.com/bitrise-core/bitrise-plugins-analytics/blob/master/README.md")
 
 		if err := analytics.SendAnonymizedAnalytics(buildRunResults); err != nil {
 			log.Fatalf("Failed to send analytics, error: %s", err)
 		}
-
-		log.Infof("")
-		log.Infof("This usage helps us identify any problems with the integrations.")
-		log.Infof("The sent data only contains information about steps (id, version, runtime, error), NO logs or other data is included.")
-		log.Infof("For more information visit: https://github.com/bitrise-io/bitrise/blob/master/README.md")
-		log.Infof("")
 	} else {
 		cli.ShowAppHelp(c)
 	}

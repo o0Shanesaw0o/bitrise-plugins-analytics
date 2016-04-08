@@ -1,6 +1,11 @@
-## Changelog (Current version: 0.9.3)
+## Changelog (Current version: 0.9.4)
 
 -----------------
+
+### 0.9.4 (2016 Apr 08)
+
+* [272a582] Merge pull request #2 from bitrise-core/log_fixes
+* [e049860] less log
 
 ### 0.9.3 (2016 Apr 06)
 
@@ -23,4 +28,4 @@
 
 -----------------
 
-Updated: 2016 Apr 06
+Updated: 2016 Apr 08

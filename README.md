@@ -3,8 +3,9 @@
 Analytics Plugin for Bitrise CLI
 
 Submitting anonymized usage information.  
-This usage helps us identify any problems with the integrations.  
-The sent data only contains information about steps (id, version, runtime, error), NO logs or other data is included.
+This usage helps us identify problems with the integrations.  
+
+The sent data only contains information about steps (id, version, runtime, error), **NO logs or other data is included**.
 
 ## How to use this Plugin
 

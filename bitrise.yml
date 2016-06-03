@@ -29,8 +29,11 @@ workflows:
             #!/bin/bash
             set -e
 
-            bitrise :$PLUGIN_NAME --loglevel debug on
-            bitrise :$PLUGIN_NAME --loglevel debug -v
+            echo "Analytics version:"
+            bitrise :$PLUGIN_NAME -v
+
+            echo "Turn analytics on:"
+            bitrise :$PLUGIN_NAME on
 
   create-bin:
     steps:
@@ -78,15 +81,10 @@ workflows:
         inputs:
         - content: |
             #!/bin/bash
-
             set -e
 
-            # Draft new release
             export CI=true
-            releaseman create \
-              --get-version-script "go run _scripts/get_version.go -file $VERSION_FILE_PATH" \
-              --bump-version patch \
-              --set-version-script "bash _scripts/set_version.sh $VERSION_FILE_PATH"
+            releaseman create --bump-version patch
 
   create-release-version:
     envs:
@@ -97,11 +95,7 @@ workflows:
         inputs:
         - content: |
             #!/bin/bash
-
             set -e
 
-            # Draft new release
             export CI=true
-            releaseman create \
-              --version $RELEASE_VERSION \
-              --set-version-script "bash _scripts/set_version.sh $VERSION_FILE_PATH"
+            releaseman create --version $RELEASE_VERSION

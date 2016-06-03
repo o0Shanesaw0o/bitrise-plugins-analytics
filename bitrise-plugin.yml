@@ -1,7 +1,9 @@
 name: analytics
 description: |-
   Submitting anonymized usage information.
+
   This usage helps us identify any problems with the integrations.
+
   The sent data only contains information about steps (id, version, runtime, error), NO logs or other data is included.
 trigger: DidFinishRun
 executable:

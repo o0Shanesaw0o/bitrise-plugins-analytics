@@ -1,6 +1,14 @@
-## Changelog (Current version: 0.9.4)
+## Changelog (Current version: 0.9.5)
 
 -----------------
+
+### 0.9.5 (2016 Oct 11)
+
+* [a5da2c4] prepare for 0.9.5
+* [d3558f2] bitrise.yml update
+* [ea1c59f] Update (#3)
+* [691c055] readme, test updates
+* [5689dae] typo/language
 
 ### 0.9.4 (2016 Apr 08)
 
@@ -28,4 +36,4 @@
 
 -----------------
 
-Updated: 2016 Apr 08
+Updated: 2016 Oct 11

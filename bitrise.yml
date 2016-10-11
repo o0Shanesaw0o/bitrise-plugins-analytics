@@ -56,6 +56,22 @@ workflows:
 
   # ----------------------------------------------------------------
   # --- workflows for Releasing
+  create-release:
+    after_run:
+    - create_binaries
+    steps:
+    - script:
+        title:
+        inputs:
+        - content: |
+            #!/bin/bash
+            set -e
+
+            export CI=true
+            releaseman create \
+              --version $RELEASE_VERSION \
+              --set-version-script "bash _scripts/set_version.sh version/version.go"
+
   create_binaries:
     title: Create binaries
     description: |
@@ -102,20 +118,6 @@ workflows:
             envman add --key LINUX_DEPLOY_PATH --value $DEPLOY_PATH
             cp $DEPLOY_PATH $BITRISE_DEPLOY_DIR/$BIN_NAME-$OS-$ARCH
             echo "  Copy final Linux binary to: $BITRISE_DEPLOY_DIR/$BIN_NAME-$OS-$ARCH"
-
-  create-release:
-    steps:
-    - script:
-        title:
-        inputs:
-        - content: |
-            #!/bin/bash
-            set -e
-
-            export CI=true
-            releaseman create \
-              --version $RELEASE_VERSION \
-              --set-version-script "bash _scripts/set_version.sh version/version.go"
 
   # ----------------------------------------------------------------
   # --- workflows for Utility

@@ -1,6 +1,10 @@
-## Changelog (Current version: 0.9.5)
+## Changelog (Current version: 0.9.6)
 
 -----------------
+
+### 0.9.6 (2016 Nov 04)
+
+* [8e9db96] Bin version fix (#4)
 
 ### 0.9.5 (2016 Oct 11)
 
@@ -36,4 +40,4 @@
 
 -----------------
 
-Updated: 2016 Oct 11
+Updated: 2016 Nov 04

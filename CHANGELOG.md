@@ -1,6 +1,10 @@
-## Changelog (Current version: 0.9.7)
+## Changelog (Current version: 0.9.8)
 
 -----------------
+
+### 0.9.8 (2017 May 09)
+
+* [65404e0] bin name fix & prepare for 0.9.8
 
 ### 0.9.7 (2017 May 09)
 

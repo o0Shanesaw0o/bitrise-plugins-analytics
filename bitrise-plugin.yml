@@ -5,10 +5,10 @@ description: |-
   This usage helps us identify any problems with the integrations.
 
   The sent data only contains information about steps (id, version, runtime, error), NO logs or other data is included.
-trigger: DidFinishRun
 executable:
-  osx: https://github.com/bitrise-core/bitrise-plugins-analytics/releases/download/0.9.6/analytics-Darwin-x86_64
-  linux: https://github.com/bitrise-core/bitrise-plugins-analytics/releases/download/0.9.6/analytics-Linux-x86_64
+  osx: https://github.com/bitrise-core/bitrise-plugins-analytics/releases/download/0.9.7/bitrise-plugins-analytics-Linux-x86_64
+  linux: https://github.com/bitrise-core/bitrise-plugins-analytics/releases/download/0.9.7/bitrise-plugins-analytics-Darwin-x86_64
+trigger: DidFinishRun
 requirements:
 - tool: bitrise
   min_version: 1.3.0

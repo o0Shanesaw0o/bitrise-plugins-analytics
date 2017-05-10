@@ -1,6 +1,11 @@
-## Changelog (Current version: 0.9.8)
+## Changelog (Current version: 0.9.9)
 
 -----------------
+
+### 0.9.9 (2017 May 10)
+
+* [2a689e7] prepare for 0.9.9
+* [6736d52] tests & fixes (#7)
 
 ### 0.9.8 (2017 May 09)
 
@@ -50,4 +55,4 @@
 
 -----------------
 
-Updated: 2017 May 09
+Updated: 2017 May 10

@@ -1,6 +1,10 @@
-## Changelog (Current version: 0.9.9)
+## Changelog (Current version: 0.9.10)
 
 -----------------
+
+### 0.9.10 (2017 Aug 07)
+
+* [d94d5d1] godeps update (#8)
 
 ### 0.9.9 (2017 May 10)
 
@@ -55,4 +59,4 @@
 
 -----------------
 
-Updated: 2017 May 10
+Updated: 2017 Aug 07

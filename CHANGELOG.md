@@ -1,6 +1,11 @@
-## Changelog (Current version: 0.9.11)
+## Changelog (Current version: 0.9.12)
 
 -----------------
+
+### 0.9.12 (2018 May 08)
+
+* [0157539] prepare for 0.9.12
+* [3a7d5f9] migrate to go dep (#10)
 
 ### 0.9.11 (2017 Dec 12)
 
@@ -64,4 +69,4 @@
 
 -----------------
 
-Updated: 2017 Dec 12
+Updated: 2018 May 08

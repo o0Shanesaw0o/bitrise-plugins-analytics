@@ -1,6 +1,11 @@
-## Changelog (Current version: 0.9.13)
+## Changelog (Current version: 0.9.14)
 
 -----------------
+
+### 0.9.14 (2018 Jun 28)
+
+* [8a2cf41] Prepare for 0.9.14
+* [5883bb3] deps update (#12)
 
 ### 0.9.13 (2018 Jun 11)
 
@@ -74,4 +79,4 @@
 
 -----------------
 
-Updated: 2018 Jun 11
+Updated: 2018 Jun 28

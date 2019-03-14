@@ -5,82 +5,113 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"os"
 	"time"
 
-	log "github.com/Sirupsen/logrus"
-	"github.com/bitrise-core/bitrise-plugins-analytics/configs"
 	models "github.com/bitrise-io/bitrise/models"
+	"github.com/bitrise-io/bitrise/plugins"
+	"github.com/bitrise-io/go-utils/log"
 )
 
 //=======================================
 // Consts
 //=======================================
 
-const analyticsURL = "https://bitrise-stats.herokuapp.com/save"
+const (
+	stackIDEnvKey    = "BITRISE_STACK_ID"
+	appSlugEnvKey    = "BITRISE_APP_SLUG"
+	buildSlugEnvKey  = "BITRISE_BUILD_SLUG"
+	analyticsBaseURL = "https://bitrise-step-analytics.herokuapp.com"
+)
 
 //=======================================
 // Models
 //=======================================
 
-// AnonymizedUsageModel ...
-type AnonymizedUsageModel struct {
-	ID      string  `json:"step"`
-	Version string  `json:"version"`
-	RunTime float64 `json:"duration"`
-	Error   bool    `json:"error"`
-	CI      bool    `json:"ci"`
+// BuildAnalytics ...
+type BuildAnalytics struct {
+	Status        string          `json:"status"`
+	StackID       string          `json:"stack_id"`
+	AppSlug       string          `json:"app_slug"`
+	Runtime       time.Duration   `json:"run_time"`
+	Platform      string          `json:"platform"`
+	BuildSlug     string          `json:"build_slug"`
+	StartTime     time.Time       `json:"start_time"`
+	CLIVersion    string          `json:"cli_version"`
+	StepAnalytics []StepAnalytics `json:"step_analytics"`
 }
 
-// AnonymizedUsageGroupModel ...
-type AnonymizedUsageGroupModel struct {
-	Steps []AnonymizedUsageModel `json:"steps"`
+// StepAnalytics ...
+type StepAnalytics struct {
+	StepID    string        `json:"step_id"`
+	Status    string        `json:"status"`
+	Runtime   time.Duration `json:"run_time"`
+	StartTime time.Time     `json:"start_time"`
 }
 
 //=======================================
 // Main
 //=======================================
 
+func buildStatus(buildFailed bool) string {
+	return map[bool]string{false: "successful", true: "failed"}[buildFailed]
+}
+
+func stepStatus(i int) string {
+	if status, ok := map[int]string{
+		models.StepRunStatusCodeFailed:           "failed",
+		models.StepRunStatusCodeSuccess:          "success",
+		models.StepRunStatusCodeSkipped:          "skipped",
+		models.StepRunStatusCodeFailedSkippable:  "failed_skippable",
+		models.StepRunStatusCodeSkippedWithRunIf: "skipped_with_runif",
+	}[i]; ok {
+		return status
+	}
+	return "unknown"
+}
+
 // SendAnonymizedAnalytics ...
 func SendAnonymizedAnalytics(buildRunResults models.BuildRunResultsModel) error {
-	stepRunResults := buildRunResults.SuccessSteps
-	stepRunResults = append(stepRunResults, buildRunResults.FailedSteps...)
-	stepRunResults = append(stepRunResults, buildRunResults.FailedSkippableSteps...)
-	stepRunResults = append(stepRunResults, buildRunResults.SkippedSteps...)
-
-	anonymizedUsageGroup := AnonymizedUsageGroupModel{}
-	for _, stepRunResult := range stepRunResults {
-		anonymizedUsageData := AnonymizedUsageModel{
-			ID:      stepRunResult.StepInfo.ID,
-			Version: stepRunResult.StepInfo.Version,
-			RunTime: stepRunResult.RunTime.Seconds(),
-			Error:   stepRunResult.Status != 0,
-			CI:      configs.IsCIMode,
-		}
-
-		anonymizedUsageGroup.Steps = append(anonymizedUsageGroup.Steps, anonymizedUsageData)
+	var (
+		runtime       time.Duration
+		stepAnalytics []StepAnalytics
+	)
+	for _, stepResult := range buildRunResults.OrderedResults() {
+		stepAnalytics, runtime = append(stepAnalytics, StepAnalytics{
+			StepID:    stepResult.StepInfo.ID,
+			Status:    stepStatus(stepResult.Status),
+			Runtime:   stepResult.RunTime,
+			StartTime: stepResult.StartTime,
+		}), runtime+stepResult.RunTime
 	}
 
-	data, err := json.Marshal(anonymizedUsageGroup)
-	if err != nil {
+	var body bytes.Buffer
+	if err := json.NewEncoder(&body).Encode(BuildAnalytics{
+		Runtime:    runtime,
+		StartTime:  buildRunResults.StartTime,
+		Platform:   buildRunResults.ProjectType,
+		StackID:    os.Getenv(stackIDEnvKey),
+		AppSlug:    os.Getenv(appSlugEnvKey),
+		BuildSlug:  os.Getenv(buildSlugEnvKey),
+		Status:     buildStatus(buildRunResults.IsBuildFailed()),
+		CLIVersion: os.Getenv(plugins.PluginInputBitriseVersionKey),
+	}); err != nil {
 		return err
 	}
 
-	req, err := http.NewRequest("POST", analyticsURL, bytes.NewBuffer(data))
+	req, err := http.NewRequest(http.MethodPost, analyticsBaseURL+"/metrics", &body)
 	if err != nil {
-		return fmt.Errorf("failed to create request with usage data (%s), error: %s", string(data), err)
+		return fmt.Errorf("failed to create request with usage data (%s), error: %s", body.String(), err)
 	}
-
 	req.Header.Set("Content-Type", "application/json")
 
-	timeout := time.Duration(10 * time.Second)
 	client := http.Client{
-		Timeout: timeout,
+		Timeout: time.Duration(10 * time.Second),
 	}
 	resp, err := client.Do(req)
 	if err != nil {
-		return fmt.Errorf("failed to perform request with usage data (%s), error: %s", string(data), err)
+		return fmt.Errorf("failed to perform request with usage data (%s), error: %s", body.String(), err)
 	}
-
 	defer func() {
 		if err := resp.Body.Close(); err != nil {
 			log.Errorf("failed to close response body, error: %#v", err)
@@ -88,8 +119,7 @@ func SendAnonymizedAnalytics(buildRunResults models.BuildRunResultsModel) error 
 	}()
 
 	if resp.StatusCode < 200 || resp.StatusCode > 210 {
-		return fmt.Errorf("sending analytics data (%s), failed with status code: %d", string(data), resp.StatusCode)
+		return fmt.Errorf("sending analytics data (%s), failed with status code: %d", body.String(), resp.StatusCode)
 	}
-
 	return nil
 }

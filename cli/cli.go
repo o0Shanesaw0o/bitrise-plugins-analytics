@@ -8,6 +8,7 @@ import (
 	"github.com/bitrise-io/bitrise-plugins-analytics/configs"
 	"github.com/bitrise-io/bitrise-plugins-analytics/version"
 	bitriseConfigs "github.com/bitrise-io/bitrise/configs"
+	"github.com/bitrise-io/bitrise/models"
 	"github.com/bitrise-io/bitrise/plugins"
 	log "github.com/bitrise-io/go-utils/log"
 	"github.com/urfave/cli"
@@ -37,14 +38,49 @@ func printVersion(c *cli.Context) {
 }
 
 func action(c *cli.Context) {
-	if os.Getenv(plugins.PluginInputPluginModeKey) == string(plugins.TriggerMode) {
-		sendAnalytics()
+	if os.Getenv(plugins.PluginInputPluginModeKey) != string(plugins.TriggerMode) {
+		log.Errorf("Required envs not set: only Bitrise CLI is intended to send build run analytics")
+
+		if err := cli.ShowAppHelp(c); err != nil {
+			failf("Failed to show help, error: %s", err)
+		}
 		return
 	}
 
-	if err := cli.ShowAppHelp(c); err != nil {
-		log.Errorf("Failed to show help, error: %s", err)
-		os.Exit(1)
+	if enabled, err := isAnalyticsEnabled(); err != nil {
+		failf("Failed to check if analytics enabled: %s", err.Error())
+	} else if !enabled {
+		log.Debugf("Build run analytics disabled, terminating...")
+		return
+	}
+
+	if warn, err := checkFormatVersion(os.Getenv(plugins.PluginInputFormatVersionKey), models.Version); err != nil {
+		failf(err.Error())
+	} else if len(warn) > 0 {
+		log.Warnf(warn)
+	}
+
+	var t SourceType
+	if available, err := hasContent(os.Stdin); err != nil {
+		failf("Failed to check if analytics enabled: %s", err.Error())
+	} else if available {
+		log.Debugf("stdin payload provided")
+		t = StdinSource
+	} else if os.Getenv(plugins.PluginInputPayloadKey) != "" {
+		log.Debugf("env payload provided")
+		t = EnvSource
+	} else {
+		log.Errorf("No stdin data nor env data provided: only Bitrise CLI is intended to send build run analytics")
+
+		if err := cli.ShowAppHelp(c); err != nil {
+			failf("Failed to show help, error: %s", err)
+		}
+		return
+	}
+
+	source := PayloadSourceFactory(t)
+	if err := sendAnalytics(source); err != nil {
+		failf("Failed to send analytics: %s", err)
 	}
 }
 
@@ -66,12 +102,16 @@ func createApp() *cli.App {
 	return app
 }
 
+func failf(format string, args ...interface{}) {
+	log.Errorf(format, args...)
+	os.Exit(1)
+}
+
 // Run ...
 func Run() {
 	cli.VersionPrinter = printVersion
 
 	if err := createApp().Run(os.Args); err != nil {
-		log.Errorf("Finished with Error: %s", err)
-		os.Exit(1)
+		failf("Finished with Error: %s", err)
 	}
 }

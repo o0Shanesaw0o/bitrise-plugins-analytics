@@ -48,13 +48,14 @@ type BuildAnalytics struct {
 
 // StepAnalytics ...
 type StepAnalytics struct {
-	StepID      string        `json:"step_id"`
-	StepTitle   string        `json:"step_title"`
-	StepVersion string        `json:"step_verion"`
-	StepSource  string        `json:"step_source"`
-	Status      string        `json:"status"`
-	Runtime     time.Duration `json:"run_time"`
-	StartTime   time.Time     `json:"start_time"`
+	StepID      string            `json:"step_id"`
+	StepTitle   string            `json:"step_title"`
+	StepVersion string            `json:"step_verion"`
+	StepSource  string            `json:"step_source"`
+	StepInputs  map[string]string `json:"step_inputs"`
+	Status      string            `json:"status"`
+	Runtime     time.Duration     `json:"run_time"`
+	StartTime   time.Time         `json:"start_time"`
 }
 
 //=======================================
@@ -90,6 +91,7 @@ func SendAnonymizedAnalytics(buildRunResults models.BuildRunResultsModel) error 
 			StepTitle:   pointers.StringWithDefault(stepResult.StepInfo.Step.Title, ""),
 			StepVersion: stepResult.StepInfo.Version,
 			StepSource:  pointers.StringWithDefault(stepResult.StepInfo.Step.SourceCodeURL, ""),
+			StepInputs:  stepResult.StepInputs,
 			Status:      stepStatus(stepResult.Status),
 			Runtime:     stepResult.RunTime,
 			StartTime:   stepResult.StartTime,

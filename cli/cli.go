@@ -75,6 +75,8 @@ func action(c *cli.Context) {
 		if err := cli.ShowAppHelp(c); err != nil {
 			failf("Failed to show help, error: %s", err)
 		}
+
+		os.Exit(1)
 		return
 	}
 

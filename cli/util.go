@@ -2,7 +2,6 @@ package cli
 
 import (
 	"fmt"
-	"os"
 
 	"github.com/bitrise-io/bitrise-plugins-analytics/configs"
 	ver "github.com/hashicorp/go-version"
@@ -42,22 +41,4 @@ func checkFormatVersion(pluginFormatVersionStr, hostBitriseFormatVersionStr stri
 	}
 
 	return "", nil
-}
-
-// HasStat ...
-type HasStat interface {
-	Stat() (os.FileInfo, error)
-}
-
-func hasContent(f HasStat) (bool, error) {
-	fi, err := f.Stat()
-	if err != nil {
-		return false, err
-	}
-
-	if fi.Mode()&os.ModeNamedPipe != 0 {
-		return true, nil
-	}
-
-	return fi.Size() > 0, nil
 }

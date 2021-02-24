@@ -1,13 +1,16 @@
-package cli
+package payload
 
 import (
 	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
+	"os"
 
 	"github.com/bitrise-io/bitrise/models"
 )
+
+var errNoInput = errors.New("nothing to read")
 
 // EnvPayloadSource ...
 type EnvPayloadSource struct {
@@ -31,8 +34,6 @@ func (s EnvPayloadSource) Payload() (models.BuildRunResultsModel, error) {
 type StdinPayloadSource struct {
 	reader io.Reader
 }
-
-var errNoInput = errors.New("nothing to read")
 
 // Payload ....
 func (s StdinPayloadSource) Payload() (models.BuildRunResultsModel, error) {
@@ -68,4 +69,23 @@ func read(r io.Reader) ([]byte, error) {
 		buff = append(buff, chunk[:n]...)
 	}
 	return buff, nil
+}
+
+// HasStat ...
+type HasStat interface {
+	Stat() (os.FileInfo, error)
+}
+
+// HasContent ...
+func HasContent(f HasStat) (bool, error) {
+	fi, err := f.Stat()
+	if err != nil {
+		return false, err
+	}
+
+	if fi.Mode()&os.ModeNamedPipe != 0 {
+		return true, nil
+	}
+
+	return fi.Size() > 0, nil
 }

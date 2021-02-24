@@ -6,6 +6,7 @@ import (
 	"path"
 
 	"github.com/bitrise-io/bitrise-plugins-analytics/configs"
+	"github.com/bitrise-io/bitrise-plugins-analytics/payload"
 	"github.com/bitrise-io/bitrise-plugins-analytics/version"
 	bitriseConfigs "github.com/bitrise-io/bitrise/configs"
 	"github.com/bitrise-io/bitrise/models"
@@ -60,15 +61,15 @@ func action(c *cli.Context) {
 		log.Warnf(warn)
 	}
 
-	var t SourceType
-	if available, err := hasContent(os.Stdin); err != nil {
+	var t payload.SourceType
+	if available, err := payload.HasContent(os.Stdin); err != nil {
 		failf("Failed to check if analytics enabled: %s", err.Error())
 	} else if available {
 		log.Debugf("stdin payload provided")
-		t = StdinSource
+		t = payload.StdinSource
 	} else if os.Getenv(configs.PluginConfigPayloadKey) != "" {
 		log.Debugf("env payload provided")
-		t = EnvSource
+		t = payload.EnvSource
 	} else {
 		log.Errorf("No stdin data nor env data provided: only Bitrise CLI is intended to send build run analytics")
 
@@ -80,7 +81,7 @@ func action(c *cli.Context) {
 		return
 	}
 
-	source := PayloadSourceFactory(t)
+	source := payload.SourceFactory(t)
 	if err := sendAnalytics(source); err != nil {
 		failf("Failed to send analytics: %s", err)
 	}
